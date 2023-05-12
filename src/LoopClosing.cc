@@ -17,6 +17,7 @@
 * You should have received a copy of the GNU General Public License
 * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
 */
+#include <unistd.h>
 
 #include "LoopClosing.h"
 
@@ -469,7 +470,7 @@ void LoopClosing::CorrectLoop()
         }
 
         // Correct all MapPoints obsrved by current keyframe and neighbors, so that they align with the other side of the loop
-        for(KeyFrameAndPose::iterator mit=CorrectedSim3.begin(), mend=CorrectedSim3.end(); mit!=mend; mit++)
+        for (auto mit = CorrectedSim3.begin(), mend = CorrectedSim3.end(); mit != mend; ++mit)
         {
             KeyFrame* pKFi = mit->first;
             g2o::Sim3 g2oCorrectedSiw = mit->second;

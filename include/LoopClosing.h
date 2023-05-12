@@ -45,9 +45,11 @@ class LoopClosing
 {
 public:
 
-    typedef pair<set<KeyFrame*>,int> ConsistentGroup;    
-    typedef map<KeyFrame*,g2o::Sim3,std::less<KeyFrame*>,
-        Eigen::aligned_allocator<std::pair<const KeyFrame*, g2o::Sim3> > > KeyFrameAndPose;
+    typedef pair<set<KeyFrame*>,int> ConsistentGroup;
+    typedef std::unordered_map<KeyFrame *, g2o::Sim3, std::hash<KeyFrame *>,
+                               std::equal_to<KeyFrame *>,
+                               Eigen::aligned_allocator<std::pair<KeyFrame *const, g2o::Sim3>>>
+        KeyFrameAndPose;
 
 public:
 

@@ -1,0 +1,373 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 08a8af4..fa887be 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.1)
+ project(ORB_SLAM2)
+ 
+ IF(NOT CMAKE_BUILD_TYPE)
+@@ -10,21 +10,13 @@ MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall  -O3 -march=native ")
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3 -march=native")
+ 
+-# Check C++11 or C++0x support
+-include(CheckCXXCompilerFlag)
+-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+-if(COMPILER_SUPPORTS_CXX11)
+-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+-   add_definitions(-DCOMPILEDWITHC11)
+-   message(STATUS "Using flag -std=c++11.")
+-elseif(COMPILER_SUPPORTS_CXX0X)
+-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+-   add_definitions(-DCOMPILEDWITHC0X)
+-   message(STATUS "Using flag -std=c++0x.")
+-else()
+-   message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+-endif()
++# Set C++11 as the required standard
++set(CMAKE_CXX_STANDARD 11)
++set(CMAKE_CXX_STANDARD_REQUIRED ON)
++set(CMAKE_CXX_EXTENSIONS OFF)
++
++add_definitions(-DCOMPILEDWITHC11)
++message(STATUS "Using C++11 standard.")
+ 
+ LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
+ 
+@@ -36,7 +28,9 @@ if(NOT OpenCV_FOUND)
+    endif()
+ endif()
+ 
+-find_package(Eigen3 3.1.0 REQUIRED)
++include_directories("/opt/homebrew/include/eigen3")
++find_package(Eigen3 3.1.0 REQUIRED NO_MODULE)
++
+ find_package(Pangolin REQUIRED)
+ 
+ include_directories(
+@@ -74,8 +68,8 @@ target_link_libraries(${PROJECT_NAME}
+ ${OpenCV_LIBS}
+ ${EIGEN3_LIBS}
+ ${Pangolin_LIBRARIES}
+-${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
+-${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
++${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.dylib
++${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.dylib
+ )
+ 
+ # Build examples
+@@ -96,7 +90,6 @@ add_executable(stereo_euroc
+ Examples/Stereo/stereo_euroc.cc)
+ target_link_libraries(stereo_euroc ${PROJECT_NAME})
+ 
+-
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/Monocular)
+ 
+ add_executable(mono_tum
+@@ -110,4 +103,3 @@ target_link_libraries(mono_kitti ${PROJECT_NAME})
+ add_executable(mono_euroc
+ Examples/Monocular/mono_euroc.cc)
+ target_link_libraries(mono_euroc ${PROJECT_NAME})
+-
+diff --git a/Examples/Monocular/mono_euroc.cc b/Examples/Monocular/mono_euroc.cc
+index 4bcb90f..997fe61 100644
+--- a/Examples/Monocular/mono_euroc.cc
++++ b/Examples/Monocular/mono_euroc.cc
+@@ -18,6 +18,7 @@
+ * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
++#include <unistd.h>
+ 
+ #include<iostream>
+ #include<algorithm>
+diff --git a/Examples/Monocular/mono_kitti.cc b/Examples/Monocular/mono_kitti.cc
+index f2f7b3e..25ffdca 100644
+--- a/Examples/Monocular/mono_kitti.cc
++++ b/Examples/Monocular/mono_kitti.cc
+@@ -18,6 +18,7 @@
+ * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
++#include <unistd.h>
+ 
+ #include<iostream>
+ #include<algorithm>
+diff --git a/Examples/Monocular/mono_tum.cc b/Examples/Monocular/mono_tum.cc
+index 09a2afc..986ce6f 100644
+--- a/Examples/Monocular/mono_tum.cc
++++ b/Examples/Monocular/mono_tum.cc
+@@ -18,6 +18,7 @@
+ * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
++#include <unistd.h>
+ 
+ #include<iostream>
+ #include<algorithm>
+diff --git a/Examples/RGB-D/rgbd_tum.cc b/Examples/RGB-D/rgbd_tum.cc
+index 001199d..f5270a8 100644
+--- a/Examples/RGB-D/rgbd_tum.cc
++++ b/Examples/RGB-D/rgbd_tum.cc
+@@ -18,6 +18,7 @@
+ * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
++#include <unistd.h>
+ 
+ #include<iostream>
+ #include<algorithm>
+diff --git a/Examples/Stereo/stereo_euroc.cc b/Examples/Stereo/stereo_euroc.cc
+index 6bc09c5..54a7e58 100644
+--- a/Examples/Stereo/stereo_euroc.cc
++++ b/Examples/Stereo/stereo_euroc.cc
+@@ -18,6 +18,7 @@
+ * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
++#include <unistd.h>
+ 
+ #include<iostream>
+ #include<algorithm>
+diff --git a/Examples/Stereo/stereo_kitti.cc b/Examples/Stereo/stereo_kitti.cc
+index cb8bc40..d7f3d3f 100644
+--- a/Examples/Stereo/stereo_kitti.cc
++++ b/Examples/Stereo/stereo_kitti.cc
+@@ -18,7 +18,7 @@
+ * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+-
++#include <unistd.h>
+ #include<iostream>
+ #include<algorithm>
+ #include<fstream>
+diff --git a/Thirdparty/DBoW2/DBoW2/FORB.cpp b/Thirdparty/DBoW2/DBoW2/FORB.cpp
+index 1f1990c..9d3f61b 100644
+--- a/Thirdparty/DBoW2/DBoW2/FORB.cpp
++++ b/Thirdparty/DBoW2/DBoW2/FORB.cpp
+@@ -13,7 +13,8 @@
+ #include <vector>
+ #include <string>
+ #include <sstream>
+-#include <stdint-gcc.h>
++#include <cstdint>
++
+ 
+ #include "FORB.h"
+ 
+diff --git a/Thirdparty/g2o/g2o/core/estimate_propagator.h b/Thirdparty/g2o/g2o/core/estimate_propagator.h
+index 6a16d11..3384075 100644
+--- a/Thirdparty/g2o/g2o/core/estimate_propagator.h
++++ b/Thirdparty/g2o/g2o/core/estimate_propagator.h
+@@ -37,7 +37,7 @@
+ #ifdef _MSC_VER
+ #include <unordered_map>
+ #else
+-#include <tr1/unordered_map>
++#include <unordered_map>
+ #endif
+ 
+ namespace g2o {
+@@ -135,7 +135,7 @@ namespace g2o {
+           size_t operator ()(const OptimizableGraph::Vertex* v) const { return v->id();}
+       };
+ 
+-      typedef std::tr1::unordered_map<OptimizableGraph::Vertex*, AdjacencyMapEntry, VertexIDHashFunction> AdjacencyMap;
++      typedef std::unordered_map<OptimizableGraph::Vertex*, AdjacencyMapEntry, VertexIDHashFunction> AdjacencyMap;
+ 
+     public:
+       EstimatePropagator(OptimizableGraph* g);
+diff --git a/Thirdparty/g2o/g2o/core/hyper_graph.h b/Thirdparty/g2o/g2o/core/hyper_graph.h
+index da6bb3d..077db28 100644
+--- a/Thirdparty/g2o/g2o/core/hyper_graph.h
++++ b/Thirdparty/g2o/g2o/core/hyper_graph.h
+@@ -38,7 +38,7 @@
+ #ifdef _MSC_VER
+ #include <unordered_map>
+ #else
+-#include <tr1/unordered_map>
++#include <unordered_map>
+ #endif
+ 
+ 
+@@ -90,7 +90,7 @@ namespace g2o {
+       typedef std::set<Edge*>                           EdgeSet;
+       typedef std::set<Vertex*>                         VertexSet;
+ 
+-      typedef std::tr1::unordered_map<int, Vertex*>     VertexIDMap;
++      typedef std::unordered_map<int, Vertex*>     VertexIDMap;
+       typedef std::vector<Vertex*>                      VertexContainer;
+ 
+       //! abstract Vertex, your types must derive from that one
+diff --git a/Thirdparty/g2o/g2o/core/marginal_covariance_cholesky.h b/Thirdparty/g2o/g2o/core/marginal_covariance_cholesky.h
+index e7dfce8..c64b30a 100644
+--- a/Thirdparty/g2o/g2o/core/marginal_covariance_cholesky.h
++++ b/Thirdparty/g2o/g2o/core/marginal_covariance_cholesky.h
+@@ -36,7 +36,7 @@
+ #ifdef _MSC_VER
+ #include <unordered_map>
+ #else
+-#include <tr1/unordered_map>
++#include <unordered_map>
+ #endif
+ 
+ 
+@@ -50,7 +50,7 @@ namespace g2o {
+       /**
+        * hash struct for storing the matrix elements needed to compute the covariance
+        */
+-      typedef std::tr1::unordered_map<int, double>     LookupMap;
++      typedef std::unordered_map<int, double>     LookupMap;
+     
+     public:
+       MarginalCovarianceCholesky();
+diff --git a/Thirdparty/g2o/g2o/core/robust_kernel.h b/Thirdparty/g2o/g2o/core/robust_kernel.h
+index 29e1394..0a47c5a 100644
+--- a/Thirdparty/g2o/g2o/core/robust_kernel.h
++++ b/Thirdparty/g2o/g2o/core/robust_kernel.h
+@@ -30,7 +30,7 @@
+ #ifdef _MSC_VER
+ #include <memory>
+ #else
+-#include <tr1/memory>
++#include <memory>
+ #endif
+ #include <Eigen/Core>
+ 
+@@ -74,7 +74,7 @@ namespace g2o {
+     protected:
+       double _delta;
+   };
+-  typedef std::tr1::shared_ptr<RobustKernel> RobustKernelPtr;
++  typedef std::shared_ptr<RobustKernel> RobustKernelPtr;
+ 
+ } // end namespace g2o
+ 
+diff --git a/Thirdparty/g2o/g2o/core/sparse_block_matrix_ccs.h b/Thirdparty/g2o/g2o/core/sparse_block_matrix_ccs.h
+index eb9042c..5936f33 100644
+--- a/Thirdparty/g2o/g2o/core/sparse_block_matrix_ccs.h
++++ b/Thirdparty/g2o/g2o/core/sparse_block_matrix_ccs.h
+@@ -37,7 +37,7 @@
+ #ifdef _MSC_VER
+ #include <unordered_map>
+ #else
+-#include <tr1/unordered_map>
++#include <unordered_map>
+ #endif
+ 
+ namespace g2o {
+@@ -223,7 +223,7 @@ namespace g2o {
+       //! rows of the matrix
+       int rows() const {return _rowBlockIndices.size() ? _rowBlockIndices.back() : 0;}
+ 
+-      typedef std::tr1::unordered_map<int, MatrixType*> SparseColumn;
++      typedef std::unordered_map<int, MatrixType*> SparseColumn;
+ 
+       SparseBlockMatrixHashMap(const std::vector<int>& rowIndices, const std::vector<int>& colIndices) :
+         _rowBlockIndices(rowIndices), _colBlockIndices(colIndices)
+diff --git a/include/LoopClosing.h b/include/LoopClosing.h
+index 7eb0416..1b2122f 100644
+--- a/include/LoopClosing.h
++++ b/include/LoopClosing.h
+@@ -45,9 +45,11 @@ class LoopClosing
+ {
+ public:
+ 
+-    typedef pair<set<KeyFrame*>,int> ConsistentGroup;    
+-    typedef map<KeyFrame*,g2o::Sim3,std::less<KeyFrame*>,
+-        Eigen::aligned_allocator<std::pair<const KeyFrame*, g2o::Sim3> > > KeyFrameAndPose;
++    typedef pair<set<KeyFrame*>,int> ConsistentGroup;
++    typedef std::unordered_map<KeyFrame *, g2o::Sim3, std::hash<KeyFrame *>,
++                               std::equal_to<KeyFrame *>,
++                               Eigen::aligned_allocator<std::pair<KeyFrame *const, g2o::Sim3>>>
++        KeyFrameAndPose;
+ 
+ public:
+ 
+diff --git a/src/LocalMapping.cc b/src/LocalMapping.cc
+index 6c87a6e..81011c9 100644
+--- a/src/LocalMapping.cc
++++ b/src/LocalMapping.cc
+@@ -17,6 +17,7 @@
+ * You should have received a copy of the GNU General Public License
+ * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
+ */
++#include <unistd.h>
+ 
+ #include "LocalMapping.h"
+ #include "LoopClosing.h"
+diff --git a/src/LoopClosing.cc b/src/LoopClosing.cc
+index 5e317dd..1718ab0 100644
+--- a/src/LoopClosing.cc
++++ b/src/LoopClosing.cc
+@@ -17,6 +17,7 @@
+ * You should have received a copy of the GNU General Public License
+ * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
+ */
++#include <unistd.h>
+ 
+ #include "LoopClosing.h"
+ 
+@@ -469,7 +470,7 @@ void LoopClosing::CorrectLoop()
+         }
+ 
+         // Correct all MapPoints obsrved by current keyframe and neighbors, so that they align with the other side of the loop
+-        for(KeyFrameAndPose::iterator mit=CorrectedSim3.begin(), mend=CorrectedSim3.end(); mit!=mend; mit++)
++        for (auto mit = CorrectedSim3.begin(), mend = CorrectedSim3.end(); mit != mend; ++mit)
+         {
+             KeyFrame* pKFi = mit->first;
+             g2o::Sim3 g2oCorrectedSiw = mit->second;
+diff --git a/src/ORBmatcher.cc b/src/ORBmatcher.cc
+index 56bf279..012b38c 100644
+--- a/src/ORBmatcher.cc
++++ b/src/ORBmatcher.cc
+@@ -27,7 +27,7 @@
+ 
+ #include "Thirdparty/DBoW2/DBoW2/FeatureVector.h"
+ 
+-#include<stdint-gcc.h>
++#include <cstdint>
+ 
+ using namespace std;
+ 
+diff --git a/src/System.cc b/src/System.cc
+index 8df4157..d12275c 100644
+--- a/src/System.cc
++++ b/src/System.cc
+@@ -19,6 +19,7 @@
+ */
+ 
+ 
++#include <unistd.h>
+ 
+ #include "System.h"
+ #include "Converter.h"
+diff --git a/src/Tracking.cc b/src/Tracking.cc
+index 2273b2c..a98fdf5 100644
+--- a/src/Tracking.cc
++++ b/src/Tracking.cc
+@@ -18,7 +18,7 @@
+ * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+-
++#include <unistd.h>
+ #include "Tracking.h"
+ 
+ #include<opencv2/core/core.hpp>
+diff --git a/src/Viewer.cc b/src/Viewer.cc
+index dec3204..8115b78 100644
+--- a/src/Viewer.cc
++++ b/src/Viewer.cc
+@@ -18,6 +18,7 @@
+ * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
++#include <unistd.h>
+ #include "Viewer.h"
+ #include <pangolin/pangolin.h>
+ 
